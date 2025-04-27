@@ -109,16 +109,6 @@ A PDF report summarizing the approach is included in `docs/`.
 - Daily exchange-rate updates for multi-currency logic.  
 - Moderate volume (~1 M rows/month).
 
----
 
-## Next Steps
-
-1. **Finalize** UI/API specs with Backoffice.  
-2. **Build** SSIS scripts & dbt models in parallel.  
-3. **Deploy** and validate in dev, then pilot on production.  
-4. **Roll out** Power BI DQ dashboards and SLA monitoring.  
-5. **Governance**: schedule monthly reviews with stakeholders.
-
----
 
 © 2025 — IMAGO Data Coding Challenge Solution  
