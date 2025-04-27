@@ -55,6 +55,70 @@ A PDF report summarizing the approach is included in `docs/`.
    - **SSIS** procedures:  
      - `sp_CheckFileIntegrity` (empty/header‐only files)  
      - `sp_ValidateCsvSchema` (schema, null/invalid keys, placeholder detection)  
-   - **Dead-letter queue** + SLA tracking (`dbo.dead_letter
+   - **Dead-letter queue** + SLA tracking (`dbo.dead_letter_queue`, `dbo.sla_tracking`)  
+   - **Placeholder Review UI** (marketing triage)  
 
+2. **Bronze Layer**  
+   - **SSIS Bulk-Insert** into `bronze.Stg_Invoices`  
+   - **Quarantine** rows with invalid ReId/KdNr → `bronze.quarantine_Invoices`  
+   - **Provenance** via `sp_LogProvenance` → `dbo.data_provenance`  
 
+3. **Silver Layer**  
+   - **dbt staging** models expose Bronze tables  
+   - **Dynamic DQ** (`sp_ValidateDQ`): rule‐driven quarantine/warnings + Power BI alerts  
+   - **Cross-Table Validation** (`sp_ValidateCrossTable`)  
+   - **Business Logic**:  
+     - `int_invoice_status` (multi‐currency, partial/full disputes, dynamic thresholds)  
+     - `int_position_flags` (placeholder flags)  
+   - **Schema & Custom Tests** in `schema.yml` / `tests/`  
+
+4. **Gold Layer**  
+   - `fct_revenue` fact table (USD revenue, payment_status)  
+   - `dim_customers` dimension table  
+
+**Impacts:**  
+- **Finance**: accurate, granular payment‐status reporting  
+- **Marketing**: self-service placeholder review  
+- **Data Ops**: real-time DQ alerts, full lineage, SLA dashboards  
+
+---
+
+### Task 3: Modern Tooling  
+**Objective:** Phase in dbt, Airflow, and Snowflake with minimal disruption.  
+
+**Files:**  
+- `migration/airflow_dags/raw_to_bronze.py` — sample Airflow ingestion DAG  
+- `migration/migration_plan.md` — phased migration plan, retained components, risks  
+
+**Approach:**  
+- **Dual-path run** (6–8 weeks) with daily reconciliation  
+- **Pilot domain** cutover, then staged SSIS shutdown with fallback  
+- **Retained:**  
+  - DQ & placeholder rules (`dq_rules`, `placeholder_rules`)  
+  - Provenance logging (`data_provenance`)  
+  - Business-logic views (`vw_Invoices_Status`, `vw_Positions_Flagged`)  
+- **Risks:** Snowflake costs, team up-skilling, logic drift, downstream schema changes  
+
+---
+
+## Assumptions
+
+- Mock data accurately represents production schemas.  
+- Existing SQL Server/SSIS infrastructure remains for Task 2.  
+- Business owners maintain config tables via UIs.  
+- Daily exchange-rate updates for multi-currency logic.  
+- Moderate volume (~1 M rows/month).
+
+---
+
+## Next Steps
+
+1. **Finalize** UI/API specs with Backoffice.  
+2. **Build** SSIS scripts & dbt models in parallel.  
+3. **Deploy** and validate in dev, then pilot on production.  
+4. **Roll out** Power BI DQ dashboards and SLA monitoring.  
+5. **Governance**: schedule monthly reviews with stakeholders.
+
+---
+
+© 2025 — IMAGO Data Coding Challenge Solution  
