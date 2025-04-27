@@ -86,9 +86,6 @@ A PDF report summarizing the approach is included in `docs/`.
 ### Task 3: Modern Tooling  
 **Objective:** Phase in dbt, Airflow, and Snowflake with minimal disruption.  
 
-**Files:**  
-- `migration/airflow_dags/raw_to_bronze.py` — sample Airflow ingestion DAG  
-- `migration/migration_plan.md` — phased migration plan, retained components, risks  
 
 **Approach:**  
 - **Dual-path run** (6–8 weeks) with daily reconciliation  
